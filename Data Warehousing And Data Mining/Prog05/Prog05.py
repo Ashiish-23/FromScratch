@@ -2,13 +2,6 @@ import pandas as pd
 from mlxtend.preprocessing import TransactionEncoder
 from mlxtend.frequent_patterns import apriori, association_rules
 
-def generate_rules(data, min_sup=0.3, metric='lift', threshold=1.0):
-    te = TransactionEncoder()
-    df = pd.DataFrame(te.fit(data).transform(data), columns=te.columns_)
-    itemsets = apriori(df, min_support=min_sup, use_colnames=True)
-    rules = association_rules(itemsets, metric=metric, min_threshold=threshold)
-    return itemsets, rules
-
 dataset = [
     ['milk', 'bread', 'nuts', 'apple'],
     ['milk', 'bread', 'nuts'],
@@ -19,6 +12,15 @@ dataset = [
     ['bread', 'nuts'],
 ]
 
-freq_items, assoc_rules = generate_rules(dataset)
-print("Frequent Itemsets:\n", freq_items)
-print("\nAssociation Rules:\n", assoc_rules)
+# Encode transactions into a binary matrix
+te = TransactionEncoder()
+df = pd.DataFrame(te.fit(dataset).transform(dataset), columns=te.columns_)
+
+# Apply Apriori algorithm
+items = apriori(df, min_support=0.2, use_colnames=True)
+
+# Generate association rules
+rules = association_rules(items, metric='lift', min_threshold=1.0)
+
+print("Frequent Itemsets:\n", items)
+print("\nAssociation Rules:\n", rules)
